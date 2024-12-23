@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Férias</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center">Lista de Férias</h2>
+        <div class="mb-3">
+            <a href="Create.html" class="btn btn-primary">Adicionar Férias</a>
+        </div>
+
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Funcionário</th>
+                    <th>Data de Início</th>
+                    <th>Data de Término</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="ferias-table-body">
+
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const apiUrl = '/api/FeriasApi';
+
+        async function loadFerias() {
+            try {
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                    throw new Error(`Erro ao buscar dados: ${response.status}`);
+                }
+
+                const feriasList = await response.json();
+                const tableBody = document.getElementById('ferias-table-body');
+                tableBody.innerHTML = '';
+
+                feriasList.forEach(ferias => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${ferias.funcionario.nome}</td>
+                        <td>${new Date(ferias.inicio).toLocaleDateString('pt-BR')}</td>
+                        <td>${new Date(ferias.termino).toLocaleDateString('pt-BR')}</td>
+                        <td>${ferias.status === 'pendente' 
+                            ? 'Pendente' 
+                            : ferias.status === 'andamento' 
+                            ? 'Em andamento' 
+                            : 'Concluída'}</td>
+                        <td>
+                            <a href="details-ferias.html?id=${ferias.id}" class="btn btn-info btn-sm">Detalhes</a>
+                            <a href="edit-ferias.html?id=${ferias.id}" class="btn btn-warning btn-sm">Editar</a>
+                            <button class="btn btn-danger btn-sm" onclick="deleteFerias(${ferias.id})">Excluir</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar lista de férias:', error);
+                alert('Erro ao carregar lista de férias. Tente novamente mais tarde.');
+            }
+        }
+
+        async function deleteFerias(id) {
+            if (!confirm('Tem certeza de que deseja excluir esta férias?')) return;
+
+            try {
+                const response = await fetch(`${apiUrl}/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Férias excluída com sucesso!');
+                    loadFerias();
+                } else {
+                    throw new Error(`Erro ao excluir: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Erro ao excluir férias:', error);
+                alert('Não foi possível excluir a férias.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadFerias);
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Funcionário</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center">Editar Funcionário</h1>
+        <form id="edit-form">
+            <input type="hidden" id="id">
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome</label>
+                <input type="text" class="form-control" id="nome" required>
+            </div>
+            <div class="mb-3">
+                <label for="cargo" class="form-label">Cargo</label>
+                <input type="text" class="form-control" id="cargo" required>
+            </div>
+            <div class="mb-3">
+                <label for="admissao" class="form-label">Data de Admissão</label>
+                <input type="date" class="form-control" id="admissao" required>
+            </div>
+            <div class="mb-3">
+                <label for="salario" class="form-label">Salário</label>
+                <input type="number" class="form-control" id="salario" step="0.01" required>
+            </div>
+            <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select id="status" class="form-control" required>
+                    <option value="true">Ativo</option>
+                    <option value="false">Inativo</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-success">Salvar</button>
+            <a href="index.html" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+
+    <script>
+        const apiUrl = '/api/FuncionariosApi';
+        const urlParams = new URLSearchParams(window.location.search);
+        const funcionarioId = urlParams.get('id');
+
+        async function loadFuncionario() {
+            try {
+                const response = await fetch(`${apiUrl}/${funcionarioId}`);
+                const funcionario = await response.json();
+
+                document.getElementById('id').value = funcionario.id;
+                document.getElementById('nome').value = funcionario.nome;
+                document.getElementById('cargo').value = funcionario.cargo;
+                document.getElementById('admissao').value = funcionario.admissao.split('T')[0];
+                document.getElementById('salario').value = funcionario.salario;
+                document.getElementById('status').value = funcionario.status ? 'true' : 'false';
+            } catch (error) {
+                console.error('Erro ao carregar funcionário:', error);
+            }
+        }
+
+        document.getElementById('edit-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const funcionario = {
+                id: document.getElementById('id').value,
+                nome: document.getElementById('nome').value,
+                cargo: document.getElementById('cargo').value,
+                admissao: document.getElementById('admissao').value,
+                salario: parseFloat(document.getElementById('salario').value),
+                status: document.getElementById('status').value === 'true',
+            };
+
+            try {
+                const response = await fetch(`${apiUrl}/${funcionario.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(funcionario),
+                });
+
+                if (response.ok) {
+                    alert('Funcionário atualizado com sucesso!');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Erro ao atualizar funcionário.');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadFuncionario);
+    </script>
+</body>
+</html>

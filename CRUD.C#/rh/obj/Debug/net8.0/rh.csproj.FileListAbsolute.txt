@@ -1,0 +1,8 @@
+C:\Users\NatyB\CRUD.C#\rh\obj\Debug\net8.0\rh.csproj.AssemblyReference.cache
+C:\Users\NatyB\CRUD.C#\rh\obj\Debug\net8.0\rh.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\NatyB\CRUD.C#\rh\obj\Debug\net8.0\rh.AssemblyInfoInputs.cache
+C:\Users\NatyB\CRUD.C#\rh\obj\Debug\net8.0\rh.AssemblyInfo.cs
+C:\Users\NatyB\CRUD.C#\rh\obj\Debug\net8.0\rh.csproj.CoreCompileInputs.cache
+C:\Users\NatyB\CRUD.C#\rh\obj\Debug\net8.0\rh.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\NatyB\CRUD.C#\rh\obj\Debug\net8.0\rh.RazorAssemblyInfo.cache
+C:\Users\NatyB\CRUD.C#\rh\obj\Debug\net8.0\rh.RazorAssemblyInfo.cs

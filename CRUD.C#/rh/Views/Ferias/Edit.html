@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Férias</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center">Editar Férias</h2>
+        <form id="editFeriasForm">
+            <input type="hidden" id="Id" name="Id">
+
+            <div class="mb-3">
+                <label for="FuncionarioId" class="form-label">Funcionário:</label>
+                <select id="FuncionarioId" name="FuncionarioId" class="form-select" required>
+                    <option value="" disabled>Carregando funcionários...</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="DataInicio" class="form-label">Data de Início:</label>
+                <input type="date" id="DataInicio" name="DataInicio" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="DataTermino" class="form-label">Data de Término:</label>
+                <input type="date" id="DataTermino" name="DataTermino" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="Status" class="form-label">Status:</label>
+                <select id="Status" name="Status" class="form-select" required>
+                    <option value="Pendente">Pendente</option>
+                    <option value="Em andamento">Em andamento</option>
+                    <option value="Concluído">Concluído</option>
+                </select>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a href="/rh/Views/Ferias/Ferias.html" class="btn btn-secondary">Voltar</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const funcionariosApiUrl = '/api/FuncionariosApi';
+        const feriasApiUrl = '/api/FeriasApi';
+        const urlParams = new URLSearchParams(window.location.search);
+        const feriasId = urlParams.get('id');
+
+
+        async function loadFuncionarios() {
+            try {
+                const response = await fetch(funcionariosApiUrl);
+                if (!response.ok) throw new Error(`Erro ao carregar funcionários: ${response.status}`);
+
+                const funcionarios = await response.json();
+                const funcionarioSelect = document.getElementById('FuncionarioId');
+                funcionarioSelect.innerHTML = '<option value="" disabled>Selecione um funcionário</option>';
+
+                funcionarios.forEach(funcionario => {
+                    const option = document.createElement('option');
+                    option.value = funcionario.id;
+                    option.textContent = funcionario.nome;
+                    funcionarioSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar funcionários:', error);
+                alert('Não foi possível carregar a lista de funcionários.');
+            }
+        }
+
+
+        async function loadFerias() {
+            try {
+                const response = await fetch(`${feriasApiUrl}/${feriasId}`);
+                if (!response.ok) throw new Error(`Erro ao carregar férias: ${response.status}`);
+
+                const ferias = await response.json();
+
+                document.getElementById('Id').value = ferias.id;
+                document.getElementById('FuncionarioId').value = ferias.funcionarioId;
+                document.getElementById('DataInicio').value = ferias.inicio.split('T')[0];
+                document.getElementById('DataTermino').value = ferias.termino.split('T')[0];
+                document.getElementById('Status').value = ferias.status;
+            } catch (error) {
+                console.error('Erro ao carregar dados das férias:', error);
+                alert('Não foi possível carregar os dados das férias.');
+            }
+        }
+
+
+        document.getElementById('editFeriasForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const feriasData = {
+                id: document.getElementById('Id').value,
+                funcionarioId: document.getElementById('FuncionarioId').value,
+                inicio: document.getElementById('DataInicio').value,
+                termino: document.getElementById('DataTermino').value,
+                status: document.getElementById('Status').value
+            };
+
+            try {
+                const response = await fetch(`${feriasApiUrl}/${feriasData.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(feriasData)
+                });
+
+                if (response.ok) {
+                    alert('Férias atualizadas com sucesso!');
+                    window.location.href = '/rh/Views/Ferias/Ferias.html';
+                } else {
+                    throw new Error(`Erro ao atualizar férias: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar férias:', error);
+                alert('Não foi possível atualizar as férias. Tente novamente.');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadFuncionarios();
+            if (feriasId) {
+                await loadFerias();
+            }
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
